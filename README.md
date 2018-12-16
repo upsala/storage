@@ -1,11 +1,12 @@
 
-Chests and Showcase with Digilines
+##Chests and Showcase with Digilines
 
-1-4) Default-Chest
-5-8) Chests which can only take items of the same type,
-2,4,6,8) Locked chests
-3,4,7,8) If there are items in the chest, the first of them is shown above the chest
+![Screenshot 3](screenshots/screenshot3.png?raw=true "Screenshot 3")
 
+- Default Chests (1-4)
+- Chests which can only take items of the same type (5-8)
+- Locked Chessts (2,4,6,8)
+- Chests which shows the first item in it, above the chest (3,4,7,8)
 - All chests can be connected with pipes from the pipeworks-mod and with digilines from the digilines-mod.
 - If an pipe is connected from the bottom of the chest, and the chest receives an 'eject'-command from an digiline,
     the pipe will be filled with an item from the chest.
@@ -23,16 +24,24 @@ Chests and Showcase with Digilines
 8) Like 7, but only if the chest has the same items
 9) Sort the items in the chest
 
-Commands:
-	- eject [ <pos> | <item> ]
-	-	count [ <pos> | <item> ]
-	- get [ <pos> ]
-	- full
-	- empty
-	- find <item>
+##Digiline
+###Commands:
+- eject [ &lt;pos&gt; | &lt;item&gt; ]
+	Ejects the first stack, or the stack at &lt;pos&gt; or &lt;item&gt; into an connected pipe at the bottom of the chest
+	
+-	count [ &lt;pos&gt; | &lt;item&gt; ]
+- get [ &lt;pos&gt; ]
+	Return the itemstring of the item at position &lt;pos&gt; in the chest
+- full
+	Tests, if the chest is full
+- empty
+	Tests, if the chest is empty
+- find <item>
 
+- sort
+	Sorts the items in the chest
 
-Events:
+###Events:
   - put <item>
   - take <item>
   - full
@@ -42,4 +51,6 @@ Events:
 
 
 
-![Screenshot 2](screenshots/screenshot1.png?raw=true "Screenshot 2")
+![Screenshot 2](screenshots/screenshot2.png?raw=true "Screenshot 2")
+
+Define a channel and send an item-string (e.g. default:cobble) with digilines to display this item.
