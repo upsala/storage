@@ -16,7 +16,7 @@ function storage.remove_item(pos, node)
 	for _, obj in pairs(objs) do
 		if obj and obj:get_luaentity() and obj:get_luaentity().name == "storage:showcase_item" then
 			obj:remove()
-			break
+			--break
 		end
 	end
 end
@@ -83,7 +83,13 @@ minetest.register_entity("storage:showcase_item", {
 		if self.texture ~= nil then
 			self.object:set_properties({ textures = { self.texture } })
 		end
-		self.object:set_properties({ automatic_rotate = 1 })
+
+		local angle = math.fmod(minetest.get_us_time()/10000, 360)/180*math.pi
+		self.object:setyaw(angle)
+	end,
+	on_step = function(self, dtime)
+		local angle = math.fmod(minetest.get_us_time()/10000, 360)/180*math.pi
+		self.object:setyaw(angle)
 	end,
 	get_staticdata = function(self)
 		if self.nodename ~= nil and self.texture ~= nil then
