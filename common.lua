@@ -3,11 +3,12 @@ local tmp = {}
 storage = {}
 
 function storage.remove_item(pos, node)
-	if tmp.offset ~= nil then
-		pos.y = pos.y + tmp.offset
+	local pos2 = pos
+	if node.name ~= "storage:showcase" then
+		pos2 = vector.add(pos, { x = 0, y = 12 / 16 + .33, z = 0 })
 	end
 
-	local objs = minetest.get_objects_inside_radius(pos, 0.5)
+	local objs = minetest.get_objects_inside_radius(pos2, 0.5)
 	if not objs then
 		return
 	end
@@ -20,24 +21,20 @@ function storage.remove_item(pos, node)
 	end
 end
 
-function storage.update_item(pos, node, offset)
+function storage.update_item(pos, node)
 	local meta = minetest.get_meta(pos)
 	local itemstring = meta:get_string("item")
 
 	storage.remove_item(pos, node)
 
 	if itemstring ~= "" then
-		if offset ~= nil then
-			tmp.offset = offset
+		local pos2 = pos
+		if node.name ~= "storage:showcase" then
+			pos2 = vector.add(pos, { x = 0, y = 12 / 16 + .33, z = 0 })
 		end
 
 		tmp.nodename = node.name
 		tmp.texture = ItemStack(itemstring):get_name()
-
-		local pos2 = pos
-		if tmp.offset ~= nil then
-			pos = vector.add(pos2, { x = 0, y = tmp.offset, z = 0 })
-		end
 
 		minetest.add_entity(pos2, "storage:showcase_item")
 
@@ -48,12 +45,12 @@ function storage.update_item(pos, node, offset)
 	end
 end
 
-function storage.show_item(pos, node, itemstring, offset)
+function storage.show_item(pos, node, itemstring)
 	local meta = minetest.get_meta(pos);
 	local stack = ItemStack(itemstring)
 	if stack:is_known() then
 		meta:set_string("item", stack:get_name())
-		storage.update_item(pos, node, offset)
+		storage.update_item(pos, node)
 	else
 		storage.remove_item(pos, node)
 		meta:set_string("item", "")

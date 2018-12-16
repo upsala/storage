@@ -4,7 +4,7 @@ local on_digiline_receive = function(pos, node, channel, msg)
 	if channel == setchan then
 		local stack = ItemStack(msg)
 		if msg=="" or stack:is_known() then
-			storage.show_item(pos, node, msg, 0)
+			storage.show_item(pos, node, msg)
 		end
 	end
 end

@@ -19,7 +19,7 @@ local update_showcase = function(pos)
 
 	for _, stack in ipairs(inv:get_list("main")) do
 		if stack and not stack:is_empty() then
-			storage.show_item(pos, node, stack:get_name(), 12 / 16 + 0.33)
+			storage.show_item(pos, node, stack:get_name())
 			return
 		end
 	end
@@ -493,7 +493,7 @@ local function register_chest(output, locked, showcase, unique, tiles)
 					end
 				end,
 				on_metadata_inventory_put = function(pos, _, _, stack, player)
-					sendMessage(pos, {event="put", items={stack:to_table()}})
+					sendMessage(pos, { event = "put", items = { stack:to_table() } })
 
 					minetest.log("action", player:get_player_name() .. " puts stuff into chest at " .. minetest.pos_to_string(pos))
 
