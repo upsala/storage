@@ -1,0 +1,3 @@
+- Documentation
+- Rotation of Items isn't handled properly
+- Empty Unique-Chests can be filled with different items if they are coming to fast with pipeworks
