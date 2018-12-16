@@ -17,6 +17,10 @@ local update_showcase = function(pos)
 	local inv = meta:get_inventory()
 	local node = minetest.get_node(pos)
 
+	if node.name:find("showcase") == nil then
+		return
+	end
+
 	for _, stack in ipairs(inv:get_list("main")) do
 		if stack and not stack:is_empty() then
 			storage.show_item(pos, node, stack:get_name())
@@ -24,7 +28,7 @@ local update_showcase = function(pos)
 		end
 	end
 
-	storage.remove_item(pos, node)
+	storage.show_item(pos, node, "")
 end
 
 local function sendMessage(pos, msg)
@@ -70,7 +74,7 @@ local function is_full(inv)
 	return true
 end
 
-local on_digiline_receive = function(pos, node, channel, msg, showcase)
+local on_digiline_receive = function(pos, node, channel, msg)
 	local meta = minetest.get_meta(pos);
 	local setchan = meta:get_string("channel")
 	local inv = meta:get_inventory()
@@ -110,9 +114,7 @@ local on_digiline_receive = function(pos, node, channel, msg, showcase)
 				sendMessage(pos, { event = "take", items = { stack:to_table() } })
 				stack:clear()
 				inv:set_stack("main", msg_pos, stack)
-				if showcase then
-					update_showcase(pos)
-				end
+				update_showcase(pos)
 				if inv:is_empty("main") then
 					sendMessage(pos, { event = "empty" })
 				end
@@ -126,9 +128,7 @@ local on_digiline_receive = function(pos, node, channel, msg, showcase)
 			if stack and not stack:is_empty() then
 				tube_inject_item(pos, pos, vector.new(0, -1, 0), stack)
 				sendMessage(pos, { event = "take", items = { stack:to_table() } })
-				if showcase then
-					update_showcase(pos)
-				end
+				update_showcase(pos)
 				if inv:is_empty("main") then
 					sendMessage(pos, { event = "empty" })
 				end
@@ -145,9 +145,7 @@ local on_digiline_receive = function(pos, node, channel, msg, showcase)
 				sendMessage(pos, { event = "take", items = { stack:to_table() } })
 				stack:clear()
 				inv:set_stack("main", i, stack)
-				if showcase then
-					update_showcase(pos)
-				end
+				update_showcase(pos)
 				if inv:is_empty("main") then
 					sendMessage(pos, { event = "empty" })
 				end
@@ -157,7 +155,7 @@ local on_digiline_receive = function(pos, node, channel, msg, showcase)
 	end
 
 	if action == "sort" then
-		sort_inventory(pos, showcase)
+		sort_inventory(pos)
 	end
 
 	if action == "get" then
@@ -232,7 +230,7 @@ local tubescan = pipeworks_enabled and function(pos)
 	pipeworks.scan_for_tube_objects(pos)
 end or nil
 
-local function put_all_items(pos, sender, showcase, filtered)
+local function put_all_items(pos, sender, filtered)
 	local meta = minetest.get_meta(pos);
 	local inv = meta:get_inventory()
 
@@ -266,12 +264,10 @@ local function put_all_items(pos, sender, showcase, filtered)
 	if is_full(inv) then
 		sendMessage(pos, { event = "full" })
 	end
-	if showcase then
-		update_showcase(pos)
-	end
+	update_showcase(pos)
 end
 
-local function take_all_items(pos, sender, showcase, filtered)
+local function take_all_items(pos, sender, filtered)
 	local meta = minetest.get_meta(pos);
 	local inv = meta:get_inventory()
 
@@ -305,12 +301,10 @@ local function take_all_items(pos, sender, showcase, filtered)
 	if inv:is_empty("main") then
 		sendMessage(pos, { event = "empty" })
 	end
-	if showcase then
-		update_showcase(pos)
-	end
+	update_showcase(pos)
 end
 
-local function sort_inventory(pos, showcase)
+local function sort_inventory(pos)
 	local meta = minetest.get_meta(pos);
 	local inv = meta:get_inventory()
 
@@ -339,9 +333,7 @@ local function sort_inventory(pos, showcase)
 		end
 	end
 
-	if showcase then
-		update_showcase(pos)
-	end
+	update_showcase(pos)
 end
 
 local function register_chest(output, locked, showcase, unique, tiles)
@@ -416,26 +408,26 @@ local function register_chest(output, locked, showcase, unique, tiles)
 						minetest.get_meta(pos):set_string("channel", fields.channel)
 					end
 					if fields.put then
-						put_all_items(pos, sender, showcase, unique)
+						put_all_items(pos, sender, unique)
 					end
 					if fields.put_filtered then
-						put_all_items(pos, sender, showcase, true)
+						put_all_items(pos, sender, true)
 					end
 					if fields.take then
-						take_all_items(pos, sender, showcase)
+						take_all_items(pos, sender)
 					end
 					if fields.take_filtered then
-						take_all_items(pos, sender, showcase, true)
+						take_all_items(pos, sender, true)
 					end
 					if fields.sort then
-						sort_inventory(pos, showcase)
+						sort_inventory(pos)
 					end
 				end,
 				digiline = {
 					receptor = {},
 					effector = {
 						action = function(pos, node, channel, msg)
-							on_digiline_receive(pos, node, channel, msg, showcase)
+							on_digiline_receive(pos, node, channel, msg)
 						end
 					}
 				},
@@ -455,9 +447,7 @@ local function register_chest(output, locked, showcase, unique, tiles)
 							sendMessage(pos, { event = "overflow" })
 						end
 
-						if showcase then
-							update_showcase(pos)
-						end
+						update_showcase(pos)
 
 						return leftover
 					end,
@@ -488,18 +478,14 @@ local function register_chest(output, locked, showcase, unique, tiles)
 				on_metadata_inventory_move = function(pos, _, _, _, _, _, player)
 					minetest.log("action", player:get_player_name() .. " moves stuff in chest at " .. minetest.pos_to_string(pos))
 
-					if showcase then
-						update_showcase(pos)
-					end
+					update_showcase(pos)
 				end,
 				on_metadata_inventory_put = function(pos, _, _, stack, player)
 					sendMessage(pos, { event = "put", items = { stack:to_table() } })
 
 					minetest.log("action", player:get_player_name() .. " puts stuff into chest at " .. minetest.pos_to_string(pos))
 
-					if showcase then
-						update_showcase(pos)
-					end
+					update_showcase(pos)
 				end,
 				on_metadata_inventory_take = function(pos, listname, _, stack, player)
 					local meta = minetest.get_meta(pos)
@@ -510,9 +496,7 @@ local function register_chest(output, locked, showcase, unique, tiles)
 					sendMessage(pos, { event = "take", items = { stack:to_table() } })
 					minetest.log("action", player:get_player_name() .. " takes stuff from chest at " .. minetest.pos_to_string(pos))
 
-					if showcase then
-						update_showcase(pos)
-					end
+					update_showcase(pos)
 				end
 			}
 	)
@@ -781,23 +765,4 @@ register_chest(
 			"storage_chest_front_unique_locked.png",
 		}
 )
-
-
-
-
--- automatically restore entities lost from frames/pedestals
--- due to /clearobjects or similar
---[[
-minetest.register_abm({
-	nodenames = { "storage:unique_showcase_locked_chest", "storage:unique_showcase_chest", "storage:showcase_locked_chest", "storage:showcase_chest" },
-	interval = 15,
-	chance = 1,
-	action = function(pos, node, active_object_count, active_object_count_wider)
-		if #minetest.get_objects_inside_radius(pos, 0.5) > 0 then
-			return
-		end
-		update_showcase_item(pos)
-	end
-})]]--
-
 
