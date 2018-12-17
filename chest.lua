@@ -50,19 +50,11 @@ local function can_insert(pos, stack, unique)
 	local inv = minetest.get_meta(pos):get_inventory()
 	local can = true
 
-	if unique then
-		if not inv:is_empty("main") then
-			can = inv:contains_item("main", stack:peek_item())
-		end
+	if unique and not inv:is_empty("main") then
+		can = inv:contains_item("main", stack:peek_item())
 	end
 
-	can = can and inv:room_for_item("main", stack)
-	if can then
-		sendMessage(pos, { event = "put", items = { stack:to_table() } })
-	else
-		sendMessage(pos, { event = "full" })
-	end
-	return can
+	return can and inv:room_for_item("main", stack)
 end
 
 local function is_full(inv)
@@ -442,9 +434,14 @@ local function register_chest(output, locked, showcase, unique, tiles)
 					end,
 					insert_object = function(pos, _, stack)
 						local inv = minetest.get_meta(pos):get_inventory()
+
+						if unique and not inv:is_empty("main") and not inv:contains_item("main", stack:peek_item()) then
+							return stack
+						end
+
 						local leftover = inv:add_item("main", stack)
 						if is_full(inv) then
-							sendMessage(pos, { event = "overflow" })
+							sendMessage(pos, { event = "full" })
 						end
 
 						update_showcase(pos)
@@ -470,7 +467,6 @@ local function register_chest(output, locked, showcase, unique, tiles)
 					end
 
 					if not can_insert(pos, stack, unique) then
-						sendMessage(pos, { event = "full" })
 						return 0
 					end
 					return stack:get_count()
@@ -484,6 +480,10 @@ local function register_chest(output, locked, showcase, unique, tiles)
 					sendMessage(pos, { event = "put", items = { stack:to_table() } })
 
 					minetest.log("action", player:get_player_name() .. " puts stuff into chest at " .. minetest.pos_to_string(pos))
+
+					if is_full(inv) then
+						sendMessage(pos, { event = "full" })
+					end
 
 					update_showcase(pos)
 				end,
