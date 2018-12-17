@@ -87,7 +87,7 @@ minetest.register_entity("storage:showcase_item", {
 		local angle = math.fmod(minetest.get_us_time()/10000, 360)/180*math.pi
 		self.object:setyaw(angle)
 	end,
-	on_step = function(self, dtime)
+	on_step = function(self, _)
 		local angle = math.fmod(minetest.get_us_time()/10000, 360)/180*math.pi
 		self.object:setyaw(angle)
 	end,

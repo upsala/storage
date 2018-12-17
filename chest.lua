@@ -36,16 +36,6 @@ local function sendMessage(pos, msg)
 	digilines.receptor_send(pos, digilines.rules.default, channel, msg)
 end
 
-local function maybeString(stack)
-	if type(stack) == 'string' then
-		return stack
-	elseif type(stack) == 'table' then
-		return dump(stack)
-	else
-		return stack:to_string()
-	end
-end
-
 local function can_insert(pos, stack, unique)
 	local inv = minetest.get_meta(pos):get_inventory()
 	local can = true
@@ -66,7 +56,7 @@ local function is_full(inv)
 	return true
 end
 
-local on_digiline_receive = function(pos, node, channel, msg)
+local on_digiline_receive = function(pos, _, channel, msg)
 	local meta = minetest.get_meta(pos);
 	local setchan = meta:get_string("channel")
 	local inv = meta:get_inventory()
@@ -75,9 +65,9 @@ local on_digiline_receive = function(pos, node, channel, msg)
 		return
 	end
 
-	local action = nil
-	local msg_pos = nil
-	local msg_item = nil
+	local action
+	local msg_pos
+	local msg_item
 
 	local t_msg = type(msg)
 	if t_msg == "table" then
@@ -449,13 +439,13 @@ local function register_chest(output, locked, showcase, unique, tiles)
 						return leftover
 					end,
 				},
-				allow_metadata_inventory_move = function(pos, from_list, from_index, to_list, to_index, count, player)
+				allow_metadata_inventory_move = function(pos, _, _, _, _, count, player)
 					if check_locked(pos, player) then
 						return 0
 					end
 					return count
 				end,
-				allow_metadata_inventory_take = function(pos, listname, index, stack, player)
+				allow_metadata_inventory_take = function(pos, _, _, stack, player)
 					if check_locked(pos, player) then
 						return 0
 					end
@@ -737,7 +727,7 @@ register_chest(
 )
 
 
--- showcase unqiue locked chest --
+-- showcase unique locked chest --
 
 minetest.register_craft({
 	type = "shapeless",

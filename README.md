@@ -5,7 +5,7 @@
 
 - Default Chests (1-4)
 - Chests which can only take items of the same type (5-8)
-- Locked Chessts (2,4,6,8)
+- Locked Chests (2,4,6,8)
 - Chests which shows the first item in it, above the chest (3,4,7,8)
 - All chests can be connected with pipes from the pipeworks-mod and with digilines from the digilines-mod.
 - If an pipe is connected from the bottom of the chest, and the chest receives an 'eject'-command from an digiline,
