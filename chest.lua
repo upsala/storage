@@ -47,7 +47,9 @@ local function can_insert(pos, stack, unique)
 	return can and inv:room_for_item("main", stack)
 end
 
-local function is_full(inv)
+local function is_full(pos)
+	local inv = minetest.get_meta(pos):get_inventory()
+
 	for _, stack in ipairs(inv:get_list("main")) do
 		if stack:get_free_space() > 0 then
 			return false
@@ -199,7 +201,7 @@ local on_digiline_receive = function(pos, _, channel, msg)
 	end
 
 	if action == "is_full" then
-		if is_full(inv) then
+		if is_full(pos) then
 			sendMessage(pos, { event = "full" })
 			return
 		end
@@ -212,41 +214,50 @@ local tubescan = pipeworks_enabled and function(pos)
 	pipeworks.scan_for_tube_objects(pos)
 end or nil
 
+local function handle_move_all_items(pos, sender, filtered, src_inv, dst_inv, user_msg, event)
+	local t = {}
+	local i = 0
+	for _, stack in ipairs(src_inv:get_list("main")) do
+		i = i + 1
+
+		local skip = filtered and not stack:is_empty() and not dst_inv:is_empty("main") and not dst_inv:contains_item("main", stack:peek_item())
+
+		if not skip then
+			local rest = dst_inv:add_item("main", stack)
+
+			if stack:get_count() ~= rest:get_count() then
+				stack:take_item(rest:get_count())
+				t[#t + 1] = stack:to_table()
+
+				src_inv:set_stack("main", i, rest)
+			end
+		end
+	end
+
+	if #t ~= 0 then
+		minetest.log("action", sender:get_player_name() .. user_msg .. minetest.pos_to_string(pos))
+
+		sendMessage(pos, { event = event, items = t })
+
+		if is_full(pos) then
+			sendMessage(pos, { event = "full" })
+		end
+
+		local inv = minetest.get_meta(pos):get_inventory()
+		if inv:is_empty("main") then
+			sendMessage(pos, { event = "empty" })
+		end
+		update_showcase(pos)
+	end
+end
+
 local function put_all_items(pos, sender, filtered)
 	local meta = minetest.get_meta(pos);
 	local inv = meta:get_inventory()
 
 	local player_inv = sender:get_inventory()
 
-	local i = 0
-	local t = {}
-	for _, stack in ipairs(player_inv:get_list("main")) do
-		i = i + 1
-
-		local skip = filtered and not stack:is_empty() and not inv:contains_item("main", stack:peek_item())
-
-		if not skip then
-			local rest = inv:add_item("main", stack)
-
-			if stack:get_count() ~= rest:get_count() then
-				minetest.log("action", sender:get_player_name() .. " puts stuff into chest at " .. minetest.pos_to_string(pos))
-
-				stack:take_item(rest:get_count())
-				t[#t + 1] = stack:to_table()
-
-				player_inv:set_stack("main", i, rest)
-			end
-		end
-	end
-
-	if #t ~= 0 then
-		sendMessage(pos, { event = "put ", items = t })
-	end
-
-	if is_full(inv) then
-		sendMessage(pos, { event = "full" })
-	end
-	update_showcase(pos)
+	handle_move_all_items(pos, sender, filtered, player_inv, inv, " puts stuff into chest at ", "put")
 end
 
 local function take_all_items(pos, sender, filtered)
@@ -255,35 +266,7 @@ local function take_all_items(pos, sender, filtered)
 
 	local player_inv = sender:get_inventory()
 
-	local t = {}
-	local i = 0
-	for _, stack in ipairs(inv:get_list("main")) do
-		i = i + 1
-
-		local skip = filtered and not stack:is_empty() and not player_inv:contains_item("main", stack:peek_item())
-
-		if not skip then
-			local rest = player_inv:add_item("main", stack)
-
-			if stack:get_count() ~= rest:get_count() then
-				minetest.log("action", sender:get_player_name() .. " takes stuff from chest at " .. minetest.pos_to_string(pos))
-
-				stack:take_item(rest:get_count())
-				t[#t + 1] = stack:to_table()
-
-				inv:set_stack("main", i, rest)
-			end
-		end
-	end
-
-	if #t ~= 0 then
-		sendMessage(pos, { event = "put ", items = t })
-	end
-
-	if inv:is_empty("main") then
-		sendMessage(pos, { event = "empty" })
-	end
-	update_showcase(pos)
+	handle_move_all_items(pos, sender, filtered, inv, player_inv, " takes stuff from chest at ", "take")
 end
 
 local function sort_inventory(pos)
@@ -430,7 +413,7 @@ local function register_chest(output, locked, showcase, unique, tiles)
 						end
 
 						local leftover = inv:add_item("main", stack)
-						if is_full(inv) then
+						if is_full(pos) then
 							sendMessage(pos, { event = "full" })
 						end
 
@@ -471,7 +454,7 @@ local function register_chest(output, locked, showcase, unique, tiles)
 
 					minetest.log("action", player:get_player_name() .. " puts stuff into chest at " .. minetest.pos_to_string(pos))
 
-					if is_full(inv) then
+					if is_full(pos) then
 						sendMessage(pos, { event = "full" })
 					end
 
