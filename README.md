@@ -1,5 +1,5 @@
 
-##Chests and Showcase with Digilines
+# Chests and Showcase with Digilines and an Auto-Filter
 
 ![Screenshot 3](screenshots/screenshot3.png?raw=true "Screenshot 3")
 
@@ -24,8 +24,7 @@
 8) Like 7, but only if the chest has the same items
 9) Sort the items in the chest
 
-##Digiline
-###Commands:
+## Digiline-Commands
 - eject [ &lt;pos&gt; | &lt;item&gt; ]
 	Ejects the first stack, or the stack at &lt;pos&gt; or &lt;item&gt; into an connected pipe at the bottom of the chest
 	
@@ -41,16 +40,33 @@
 - sort
 	Sorts the items in the chest
 
-###Events:
+## Digiline-Events:
   - put <item>
   - take <item>
-  - full
-  - empty
+  - full / not full
+  - empty / not found
+  - count
+  - get
+  - items
+  - found / not found
+  
 
 
 
-
+# Showcase
 
 ![Screenshot 2](screenshots/screenshot2.png?raw=true "Screenshot 2")
 
 Define a channel and send an item-string (e.g. default:cobble) with digilines to display this item.
+
+
+# Autofilter
+
+![Screenshot 4](screenshots/screenshot4.png?raw=true "Screenshot 4")
+
+![Screenshot 5](screenshots/screenshot5.png?raw=true "Screenshot 5")
+
+An Item-Filter which works like the Pipeworks-Sorting-Pipe. You can choose an item which can pass this filter.
+If 'Self-learning' is enabled and the Filteritem is empty, the first item, which reaches the filter sets the filteritem.
+
+Optionally, the Filteritem is displayed above the filter.
