@@ -5,7 +5,9 @@ storage = {}
 function storage.remove_item(pos, node)
 	local pos2 = pos
 	if node.name ~= "storage:showcase" then
-		pos2 = vector.add(pos, { x = 0, y = 12 / 16 + .33, z = 0 })
+		local dir = pipeworks.facedir_to_top_dir(node.param2)
+		dir = vector.multiply(dir, 12 / 16 + .33)
+		pos2 = vector.add(pos, dir)
 	end
 
 	local objs = minetest.get_objects_inside_radius(pos2, 0.5)
@@ -30,7 +32,9 @@ function storage.update_item(pos, node)
 	if itemstring ~= "" then
 		local pos2 = pos
 		if node.name ~= "storage:showcase" then
-			pos2 = vector.add(pos, { x = 0, y = 12 / 16 + .33, z = 0 })
+			local dir = pipeworks.facedir_to_top_dir(node.param2)
+			dir = vector.multiply(dir, 12 / 16 + .33)
+			pos2 = vector.add(pos, dir)
 		end
 
 		tmp.nodename = node.name
@@ -101,11 +105,14 @@ minetest.register_entity("storage:showcase_item", {
 
 storage.on_timer = function(pos)
 	local pos2 = pos
-	if tmp.offset ~= nil then
-		pos2 = vector.add(pos2, { x = 0, y = tmp.offset, z = 0 })
+	local node = minetest.get_node(pos)
+
+	if node.name ~= "storage:showcase" then
+		local dir = pipeworks.facedir_to_top_dir(node.param2)
+		dir = vector.multiply(dir, 12 / 16 + .33)
+		pos2 = vector.add(pos, dir)
 	end
 
-	local node = minetest.get_node(pos)
 	local meta = minetest.get_meta(pos)
 	local num = #minetest.get_objects_inside_radius(pos2, 0.5)
 

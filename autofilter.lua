@@ -100,6 +100,7 @@ for _, data in ipairs({
 					pipeworks.on_rotate(pos, node, player, mode, new_param2)
 					update_showcase(pos)
 				end,
+				on_timer = storage.on_timer,
 				on_receive_fields = function(pos, _, fields, sender)
 					local name = sender:get_player_name()
 					if minetest.is_protected(pos, name) and not minetest.check_player_privs(name, { protection_bypass = true }) then
