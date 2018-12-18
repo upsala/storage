@@ -342,10 +342,15 @@ local function register_chest(output, locked, showcase, unique, tiles)
 							"list[current_player;main;3.5,7.3;8,4;]" ..
 							"listring[]" ..
 							"image_button[0,7.3;1,1;storage_take_items.png;take;]" ..
+							"tooltip[take;Take all items out of the chest]" ..
 							"image_button[1,7.3;1,1;storage_take_filtered_items.png;take_filtered;]" ..
+							"tooltip[take_filtered;Take all items out of the chest, which are the same as the player has]" ..
 							"image_button[0,8.3;1,1;storage_put_items.png;put;]" ..
+							"tooltip[put;Put the player's inventory into the chest]" ..
 							"image_button[1,8.3;1,1;storage_put_filtered_items.png;put_filtered;]" ..
+							"tooltip[put_filtered;Put all items from the player's inventory into the chest, if the chest has the same items]" ..
 							"image_button[0,9.3;1,1;storage_sort_items.png;sort;]" ..
+							"tooltip[sort;Sort the items in the chest]" ..
 							"textlist[11.5,7.3;3.3,3.8;descr;" .. digiline_description .. "]")
 
 					local inv = meta:get_inventory()

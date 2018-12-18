@@ -4,3 +4,4 @@ dofile(modpath.."/common.lua")
 
 dofile(modpath.."/chest.lua")
 dofile(modpath.."/showcase.lua")
+dofile(modpath.."/autofilter.lua")
