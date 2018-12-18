@@ -189,9 +189,9 @@ end
 minetest.register_craft({
 	output = "storage:autofilter",
 	recipe = {
-		{ 'default:steel_ingot', 'default:steel_ingot', 'basic_materials:plastic_sheet' },
+		{ 'default:steel_ingot', 'default:steel_ingot', 'homedecor:plastic_sheeting' },
 		{ 'pipeworks:tube_1', 'default:mese_crystal', 'pipeworks:tube_1' },
-		{ 'default:steel_ingot', 'default:steel_ingot', 'basic_materials:plastic_sheet' },
+		{ 'default:steel_ingot', 'default:steel_ingot', 'homedecor:plastic_sheeting' },
 	}
 })
 
