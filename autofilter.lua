@@ -35,12 +35,12 @@ local tubescan = pipeworks_enabled and function(pos)
 	pipeworks.scan_for_tube_objects(pos)
 end or nil
 
-local function set_formspec(pos)
+local function set_formspec(pos, data)
 	local meta = minetest.get_meta(pos)
-	meta:set_string("infotext", "Autofilter")
+	meta:set_string("infotext", data.description)
 	meta:set_string("formspec", "size[8,5]" ..
-			"item_image[0,0;1,1;storage:autofilter]" ..
-			"label[1,0;Autofilter]" ..
+			"item_image[0,0;1,1;"..data.name.."]" ..
+			"label[1,0;"..data.description.."]" ..
 			"label[3,0.3;Filteritem:]" ..
 			"list[current_name;main;4,0;1,1;]" ..
 
@@ -89,7 +89,9 @@ for _, data in ipairs({
 				paramtype2 = "facedir",
 				legacy_facedir_simple = true,
 				groups = { choppy = 2, oddly_breakable_by_hand = 2, tubedevice = 1, tubedevice_receiver = 1 },
-				on_construct = set_formspec,
+				on_construct = function(pos)
+					set_formspec(pos, data)
+				end,
 				after_place_node = pipeworks.after_place,
 				after_dig_node = function(pos, oldnode, oldmetadata, digger)
 					pipeworks.after_dig(pos)
@@ -115,7 +117,7 @@ for _, data in ipairs({
 						end
 						fs_helpers.on_receive_fields(pos, fields)
 					end
-					set_formspec(pos)
+					set_formspec(pos, data)
 				end,
 				tube = {
 					connect_sides = { right = 1, left = 1 },
@@ -185,9 +187,12 @@ for _, data in ipairs({
 end
 
 minetest.register_craft({
-	type = "shapeless",
 	output = "storage:autofilter",
-	recipe = { "storage:unique_locked_chest", "default:glass" }
+	recipe = {
+		{ 'default:steel_ingot', 'default:steel_ingot', 'basic_materials:plastic_sheet' },
+		{ 'pipeworks:tube_1', 'default:mese_crystal', 'pipeworks:tube_1' },
+		{ 'default:steel_ingot', 'default:steel_ingot', 'basic_materials:plastic_sheet' },
+	}
 })
 
 minetest.register_craft({
