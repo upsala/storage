@@ -40,6 +40,8 @@ local function can_insert(pos, stack, unique)
 	local inv = minetest.get_meta(pos):get_inventory()
 	local can = true
 
+	stack = stack:peek_item()
+
 	if unique and not inv:is_empty("main") then
 		can = inv:contains_item("main", stack:peek_item())
 	end
