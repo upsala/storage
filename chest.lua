@@ -12,10 +12,42 @@ local tube_inject_item = pipeworks.tube_inject_item or function(pos, start_pos, 
 	tubed:setacceleration(vector.new(0, 0, 0))
 end
 
+
+local function check_fill_level(pos)
+	local meta = minetest.get_meta(pos);
+	local inv = meta:get_inventory()
+	local node = minetest.get_node(pos)
+
+	local count = 0
+	for _, stack in ipairs(inv:get_list("main")) do
+		if not stack:is_empty() then
+			count = count + 1
+		end
+	end
+
+	local pct = math.floor(count / inv:get_size("main") * 5.1)
+	pct = math.max(pct, 0)
+	pct = math.min(pct, 5)
+
+	local new_name = node.name
+	local last_char = new_name:sub(#new_name)
+	if last_char=="1" or last_char=="2" or last_char=="3" or last_char=="4" or last_char=="5" then
+		new_name = new_name:sub(1, -2)
+	end
+
+	if pct>0 then
+		new_name = new_name..pct
+	end
+
+	minetest.swap_node(pos, {name = new_name})
+end
+
 local update_showcase = function(pos)
 	local meta = minetest.get_meta(pos)
 	local inv = meta:get_inventory()
 	local node = minetest.get_node(pos)
+
+	check_fill_level(pos)
 
 	if node.name:find("showcase") == nil then
 		return
@@ -305,7 +337,7 @@ local function sort_inventory(pos)
 	update_showcase(pos)
 end
 
-local function register_chest(output, locked, showcase, unique, tiles)
+local function register_chest(output, drop, locked, showcase, unique, tiles, not_in_creative_inventory)
 	local description = ((locked and "Locked ") or "") .. ((unique and "Unqiue ") or "") .. "Digiline-Chest" .. ((showcase and " with Showcase") or "")
 
 	local locked_after_place = pipeworks.after_place
@@ -332,7 +364,8 @@ local function register_chest(output, locked, showcase, unique, tiles)
 				tiles = tiles,
 				paramtype2 = "facedir",
 				legacy_facedir_simple = true,
-				groups = { choppy = 2, oddly_breakable_by_hand = 2, tubedevice = 1, tubedevice_receiver = 1 },
+				drop = drop,
+				groups = { choppy = 2, oddly_breakable_by_hand = 2, tubedevice = 1, tubedevice_receiver = 1, not_in_creative_inventory = not_in_creative_inventory },
 				on_construct = function(pos)
 					local digiline_description = "Digiline-Commands,  - eject \\[<pos>|<item>\\],  - sort,  - count \\[<pos>|<item>\\],  - get \\[<pos>\\],  - is_full,  - is_empty,  - list,  - find <item>,,Digiline-Events,  - take <item>,  - put <item>,  - full,  - empty"
 
@@ -488,6 +521,155 @@ local tubeconn = pipeworks_enabled and "^pipeworks_tube_connection_metallic.png"
 local chest = technic_enabled and "technic:gold_chest" or "default:chest"
 local locked_chest = technic_enabled and "technic:gold_locked_chest" or "default:chest_locked"
 
+for i = 0, 5 do
+	local name = i
+	local img = "^storage_chest_fill" .. i .. "_overlay.png"
+	local not_in_creative_inventory = 1
+	if i == 0 then
+		name = ""
+		img = ""
+		not_in_creative_inventory = 0
+	end
+
+	register_chest(
+			"storage:chest" .. name,
+			"storage:chest",
+			false,
+			false,
+			false,
+			{
+				"storage_chest_top.png" .. tubeconn,
+				"storage_chest_top.png" .. tubeconn,
+				"storage_chest_side.png" .. tubeconn,
+				"storage_chest_side.png" .. tubeconn,
+				"storage_chest_side.png" .. tubeconn,
+				"storage_chest_front.png" .. img,
+			},
+			not_in_creative_inventory
+	)
+
+	register_chest(
+			"storage:locked_chest" .. name,
+			"storage:locked_chest",
+			true,
+			false,
+			false,
+			{
+				"storage_chest_top.png" .. tubeconn,
+				"storage_chest_top.png" .. tubeconn,
+				"storage_chest_side.png" .. tubeconn,
+				"storage_chest_side.png" .. tubeconn,
+				"storage_chest_side.png" .. tubeconn,
+				"storage_chest_front.png^storage_chest_lock_overlay.png" .. img,
+			},
+			not_in_creative_inventory
+	)
+
+	register_chest(
+			'storage:unique_chest' .. name,
+			'storage:unique_chest',
+			false,
+			false,
+			true,
+			{
+				"storage_chest_top_unique.png" .. tubeconn,
+				"storage_chest_top_unique.png" .. tubeconn,
+				"storage_chest_side_unique.png" .. tubeconn,
+				"storage_chest_side_unique.png" .. tubeconn,
+				"storage_chest_side_unique.png" .. tubeconn,
+				"storage_chest_front_unique.png" .. img,
+			},
+			not_in_creative_inventory
+	)
+
+	register_chest(
+			'storage:unique_locked_chest' .. name,
+			'storage:unique_locked_chest',
+			true,
+			false,
+			true,
+			{
+				"storage_chest_top_unique.png" .. tubeconn,
+				"storage_chest_top_unique.png" .. tubeconn,
+				"storage_chest_side_unique.png" .. tubeconn,
+				"storage_chest_side_unique.png" .. tubeconn,
+				"storage_chest_side_unique.png" .. tubeconn,
+				"storage_chest_front_unique.png^storage_chest_lock_overlay.png" .. img,
+			},
+			not_in_creative_inventory
+	)
+
+	register_chest(
+			'storage:showcase_chest' .. name,
+			'storage:showcase_chest',
+			false,
+			true,
+			false,
+			{
+				"storage_chest_top_showcase.png",
+				"storage_chest_top.png" .. tubeconn,
+				"storage_chest_side.png" .. tubeconn,
+				"storage_chest_side.png" .. tubeconn,
+				"storage_chest_side.png" .. tubeconn,
+				"storage_chest_front.png" .. img,
+			},
+			not_in_creative_inventory
+	)
+
+	register_chest(
+			'storage:showcase_locked_chest' .. name,
+			'storage:showcase_locked_chest',
+			true,
+			true,
+			false,
+			{
+				"storage_chest_top_showcase.png",
+				"storage_chest_top.png" .. tubeconn,
+				"storage_chest_side.png" .. tubeconn,
+				"storage_chest_side.png" .. tubeconn,
+				"storage_chest_side.png" .. tubeconn,
+				"storage_chest_front.png^storage_chest_lock_overlay.png" .. img,
+			},
+			not_in_creative_inventory
+	)
+
+	register_chest(
+			'storage:showcase_unique_chest' .. name,
+			'storage:showcase_unique_chest',
+			false,
+			true,
+			true,
+			{
+				"storage_chest_top_showcase.png",
+				"storage_chest_top_unique.png" .. tubeconn,
+				"storage_chest_side_unique.png" .. tubeconn,
+				"storage_chest_side_unique.png" .. tubeconn,
+				"storage_chest_side_unique.png" .. tubeconn,
+				"storage_chest_front_unique.png" .. img,
+			},
+			not_in_creative_inventory
+	)
+
+	register_chest(
+			'storage:showcase_unique_locked_chest' .. name,
+			'storage:showcase_unique_locked_chest',
+			true,
+			true,
+			true,
+			{
+				"storage_chest_top_showcase.png",
+				"storage_chest_top_unique.png" .. tubeconn,
+				"storage_chest_side_unique.png" .. tubeconn,
+				"storage_chest_side_unique.png" .. tubeconn,
+				"storage_chest_side_unique.png" .. tubeconn,
+				"storage_chest_front_unique.png^storage_chest_lock_overlay.png" .. img,
+			},
+			not_in_creative_inventory
+	)
+end
+
+
+
 -- chest --
 
 minetest.register_craft({
@@ -504,22 +686,6 @@ minetest.register_craft({
 	output = "storage:chest",
 	recipe = { "storage:unique_chest", "dye:red" }
 })
-
-register_chest(
-		"storage:chest",
-		false,
-		false,
-		false,
-		{
-			"storage_chest_top.png" .. tubeconn,
-			"storage_chest_top.png" .. tubeconn,
-			"storage_chest_side.png" .. tubeconn,
-			"storage_chest_side.png" .. tubeconn,
-			"storage_chest_side.png" .. tubeconn,
-			"storage_chest_front.png",
-		}
-)
-
 
 -- locked chest --
 
@@ -544,22 +710,6 @@ minetest.register_craft({
 	recipe = { "storage:unique_locked_chest", "dye:red" }
 })
 
-register_chest(
-		"storage:locked_chest",
-		true,
-		false,
-		false,
-		{
-			"storage_chest_top.png" .. tubeconn,
-			"storage_chest_top.png" .. tubeconn,
-			"storage_chest_side.png" .. tubeconn,
-			"storage_chest_side.png" .. tubeconn,
-			"storage_chest_side.png" .. tubeconn,
-			"storage_chest_front.png^storage_chest_lock_overlay.png",
-		}
-)
-
-
 -- unique chest --
 
 minetest.register_craft({
@@ -576,21 +726,6 @@ minetest.register_craft({
 	output = "storage:unique_chest",
 	recipe = { "storage:chest", "dye:green" }
 })
-
-register_chest(
-		'storage:unique_chest',
-		false,
-		false,
-		true,
-		{
-			"storage_chest_top_unique.png" .. tubeconn,
-			"storage_chest_top_unique.png" .. tubeconn,
-			"storage_chest_side_unique.png" .. tubeconn,
-			"storage_chest_side_unique.png" .. tubeconn,
-			"storage_chest_side_unique.png" .. tubeconn,
-			"storage_chest_front_unique.png",
-		}
-)
 
 -- unique locked chest --
 
@@ -615,21 +750,6 @@ minetest.register_craft({
 	recipe = { "storage:unique_chest", "default:steel_ingot" }
 })
 
-register_chest(
-		'storage:unique_locked_chest',
-		true,
-		false,
-		true,
-		{
-			"storage_chest_top_unique.png" .. tubeconn,
-			"storage_chest_top_unique.png" .. tubeconn,
-			"storage_chest_side_unique.png" .. tubeconn,
-			"storage_chest_side_unique.png" .. tubeconn,
-			"storage_chest_side_unique.png" .. tubeconn,
-			"storage_chest_front_unique.png^storage_chest_lock_overlay.png",
-		}
-)
-
 -- showcase chest --
 
 minetest.register_craft({
@@ -643,22 +763,6 @@ minetest.register_craft({
 	output = "storage:showcase_chest",
 	recipe = { "storage:showcase_unique_chest", "dye:red" }
 })
-
-register_chest(
-		'storage:showcase_chest',
-		false,
-		true,
-		false,
-		{
-			"storage_chest_top_showcase.png",
-			"storage_chest_top.png" .. tubeconn,
-			"storage_chest_side.png" .. tubeconn,
-			"storage_chest_side.png" .. tubeconn,
-			"storage_chest_side.png" .. tubeconn,
-			"storage_chest_front.png",
-		}
-)
-
 
 -- showcase locked chest --
 
@@ -674,21 +778,6 @@ minetest.register_craft({
 	recipe = { "storage:showcase_unique_locked_chest", "dye:red" }
 })
 
-register_chest(
-		'storage:showcase_locked_chest',
-		true,
-		true,
-		false,
-		{
-			"storage_chest_top_showcase.png",
-			"storage_chest_top.png" .. tubeconn,
-			"storage_chest_side.png" .. tubeconn,
-			"storage_chest_side.png" .. tubeconn,
-			"storage_chest_side.png" .. tubeconn,
-			"storage_chest_front.png^storage_chest_lock_overlay.png",
-		}
-)
-
 -- showcase unique chest --
 
 minetest.register_craft({
@@ -703,22 +792,6 @@ minetest.register_craft({
 	recipe = { "storage:showcase_chest", "dye:green" }
 })
 
-register_chest(
-		'storage:showcase_unique_chest',
-		false,
-		true,
-		true,
-		{
-			"storage_chest_top_showcase.png",
-			"storage_chest_top_unique.png" .. tubeconn,
-			"storage_chest_side_unique.png" .. tubeconn,
-			"storage_chest_side_unique.png" .. tubeconn,
-			"storage_chest_side_unique.png" .. tubeconn,
-			"storage_chest_front_unique.png",
-		}
-)
-
-
 -- showcase unique locked chest --
 
 minetest.register_craft({
@@ -732,19 +805,3 @@ minetest.register_craft({
 	output = "storage:showcase_unique_locked_chest",
 	recipe = { "storage:showcase_locked_chest", "dye:green" }
 })
-
-register_chest(
-		'storage:showcase_unique_locked_chest',
-		true,
-		true,
-		true,
-		{
-			"storage_chest_top_showcase.png",
-			"storage_chest_top_unique.png" .. tubeconn,
-			"storage_chest_side_unique.png" .. tubeconn,
-			"storage_chest_side_unique.png" .. tubeconn,
-			"storage_chest_side_unique.png" .. tubeconn,
-			"storage_chest_front_unique.png^storage_chest_lock_overlay.png",
-		}
-)
-
