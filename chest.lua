@@ -33,7 +33,9 @@ end
 
 local function sendMessage(pos, msg)
 	local channel = minetest.get_meta(pos):get_string("channel")
-	digilines.receptor_send(pos, digilines.rules.default, channel, msg)
+	if channel ~= nil and channel ~= "" then
+		digilines.receptor_send(pos, digilines.rules.default, channel, msg)
+	end
 end
 
 local function can_insert(pos, stack, unique)
@@ -65,7 +67,7 @@ local on_digiline_receive = function(pos, _, channel, msg)
 	local setchan = meta:get_string("channel")
 	local inv = meta:get_inventory()
 
-	if channel ~= setchan then
+	if channel ~= setchan and channel ~= "" then
 		return
 	end
 
