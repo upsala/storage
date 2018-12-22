@@ -555,7 +555,7 @@ register_chest(
 			"storage_chest_side.png" .. tubeconn,
 			"storage_chest_side.png" .. tubeconn,
 			"storage_chest_side.png" .. tubeconn,
-			"storage_chest_front_locked.png",
+			"storage_chest_front.png^storage_chest_lock_overlay.png",
 		}
 )
 
@@ -626,7 +626,7 @@ register_chest(
 			"storage_chest_side_unique.png" .. tubeconn,
 			"storage_chest_side_unique.png" .. tubeconn,
 			"storage_chest_side_unique.png" .. tubeconn,
-			"storage_chest_front_unique_locked.png",
+			"storage_chest_front_unique.png^storage_chest_lock_overlay.png",
 		}
 )
 
@@ -685,7 +685,7 @@ register_chest(
 			"storage_chest_side.png" .. tubeconn,
 			"storage_chest_side.png" .. tubeconn,
 			"storage_chest_side.png" .. tubeconn,
-			"storage_chest_front_locked.png",
+			"storage_chest_front.png^storage_chest_lock_overlay.png",
 		}
 )
 
@@ -744,7 +744,7 @@ register_chest(
 			"storage_chest_side_unique.png" .. tubeconn,
 			"storage_chest_side_unique.png" .. tubeconn,
 			"storage_chest_side_unique.png" .. tubeconn,
-			"storage_chest_front_unique_locked.png",
+			"storage_chest_front_unique.png^storage_chest_lock_overlay.png",
 		}
 )
 
