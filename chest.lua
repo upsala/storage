@@ -113,7 +113,7 @@ local on_digiline_receive = function(pos, _, channel, msg)
 		msg_pos = tonumber(msg.pos)
 		msg_item = msg.item
 	elseif t_msg == "string" then
-		action = msg:match("%w+")
+		action = msg:match("[%w_]+")
 		msg_item = msg:match("%w+%s+(.+)")
 		msg_pos = tonumber(msg_item)
 		if msg_pos ~= nil then
@@ -455,6 +455,11 @@ local function register_chest(output, drop, locked, showcase, unique, tiles, not
 						end
 
 						local leftover = inv:add_item("main", stack)
+						stack:take_item(leftover:get_count())
+						if not stack:is_empty() then
+							sendMessage(pos, { event = "put", items = { stack:to_table() } })
+						end
+
 						if is_full(pos) then
 							sendMessage(pos, { event = "full" })
 						end
