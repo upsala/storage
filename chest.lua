@@ -39,7 +39,7 @@ local function check_fill_level(pos)
 		new_name = new_name..pct
 	end
 
-	minetest.swap_node(pos, {name = new_name})
+	minetest.swap_node(pos, {name = new_name, param2 = node.param2})
 end
 
 local update_showcase = function(pos)
