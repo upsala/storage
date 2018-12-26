@@ -214,7 +214,8 @@ local on_digiline_receive = function(pos, _, channel, msg)
 					count = count + stack:get_count()
 				end
 			end
-			sendMessage(pos, { event = "count", count = math.floor(count / itemstack.get_count()) })
+			sendMessage(pos, { event = "count", count = math.floor(count / itemstack:get_count()) })
+			return
 		end
 
 		local count = 0
