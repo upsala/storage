@@ -70,3 +70,12 @@ An Item-Filter which works like the Pipeworks-Sorting-Pipe. You can choose an it
 If 'Self-learning' is enabled and the Filteritem is empty, the first item, which reaches the filter sets the filteritem.
 
 Optionally, the Filteritem is displayed above the filter.
+
+
+# Buffer
+
+![Screenshot 6](screenshots/screenshot6.png?raw=true "Screenshot 6")
+
+An Buffer, which stores all items, which it gets and only ejects items 
+if the box is full, or if stackwise is enabled full stackes are ejected.
+
