@@ -1,8 +1,3 @@
-local S = rawget(_G, "intllib") and intllib.Getter() or function(s)
-	return s
-end
-
-local pipeworks_enabled = minetest.get_modpath("pipeworks") ~= nil
 local fs_helpers = pipeworks.fs_helpers
 
 local tube_inject_item = pipeworks.tube_inject_item or function(pos, start_pos, velocity, item)
@@ -11,10 +6,6 @@ local tube_inject_item = pipeworks.tube_inject_item or function(pos, start_pos, 
 	tubed:setvelocity(velocity)
 	tubed:setacceleration(vector.new(0, 0, 0))
 end
-
-local tubescan = pipeworks_enabled and function(pos)
-	pipeworks.scan_for_tube_objects(pos)
-end or nil
 
 local function send_stacks(pos, node)
 	local meta = minetest.get_meta(pos)
@@ -114,6 +105,7 @@ minetest.register_node(
 			end,
 			tube = {
 				connect_sides = { right = 1, left = 1 },
+				priority = 120,
 				connects = function(i, param2)
 					return not pipeworks.connects.facingFront(i, param2)
 				end,
