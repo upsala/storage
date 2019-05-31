@@ -38,6 +38,38 @@ local function send_top_item(pos, node)
 	end
 end
 
+local function set_formspec(meta)
+	meta:set_string("infotext", "Buffer")
+	meta:set_string("formspec", "size[8,5]" ..
+			"item_image[0,0;1,1;storage:buffer]" ..
+			"label[1,0;Buffer]" ..
+
+			fs_helpers.cycling_button(
+					meta,
+					"image_button[5.5,0.15;1,0.6",
+					"stackwise",
+					{
+						pipeworks.button_off,
+						pipeworks.button_on
+					}
+			) ..
+			"label[6.5,0.15;Stack-wise]" ..
+
+			fs_helpers.cycling_button(
+					meta,
+					"image_button[5.5,0.65;1,0.6",
+					"delayed",
+					{
+						pipeworks.button_off,
+						pipeworks.button_on
+					}
+			) ..
+			"label[6.5,0.65;Delayed]" ..
+
+			"list[current_name;main;0,1.3;8,4;]"
+	)
+end
+
 minetest.register_node(
 		"storage:buffer",
 		{
@@ -55,22 +87,8 @@ minetest.register_node(
 			groups = { choppy = 2, oddly_breakable_by_hand = 2, tubedevice = 1, tubedevice_receiver = 1 },
 			on_construct = function(pos)
 				local meta = minetest.get_meta(pos)
-				meta:set_string("infotext", "Buffer")
-				meta:set_string("formspec", "size[8,5]" ..
-						"item_image[0,0;1,1;storage:buffer]" ..
-						"label[1,0;Buffer]" ..
 
-						fs_helpers.cycling_button(
-								meta,
-								"image_button[5.5,0.35;1,0.6",
-								"stackwise",
-								{
-									pipeworks.button_off,
-									pipeworks.button_on
-								}
-						) ..
-						"label[6.5,0.35;Stack-wise]" ..
-						"list[current_name;main;0,1.3;8,4;]")
+				set_formspec(meta)
 
 				local inv = meta:get_inventory()
 				inv:set_size("main", 4 * 8)
@@ -92,13 +110,21 @@ minetest.register_node(
 					return
 				end
 
-				if fields["fs_helpers_cycling:0:stackwise"]
-						or fields["fs_helpers_cycling:1:stackwise"] then
+				if fields["fs_helpers_cycling:0:stackwise"] or fields["fs_helpers_cycling:1:stackwise"] then
 					if not pipeworks.may_configure(pos, sender) then
 						return
 					end
 					fs_helpers.on_receive_fields(pos, fields)
 				end
+
+				if fields["fs_helpers_cycling:0:delayed"] or fields["fs_helpers_cycling:1:delayed"] then
+					if not pipeworks.may_configure(pos, sender) then
+						return
+					end
+					fs_helpers.on_receive_fields(pos, fields)
+				end
+
+				set_formspec(minetest.get_meta(pos))
 			end,
 			on_punch = function(pos, node, puncher)
 				send_top_item(pos, node)
@@ -154,3 +180,16 @@ minetest.register_craft({
 		{ 'default:chest', 'default:chest', 'default:chest' },
 	}
 })
+
+minetest.register_abm{
+	label = "storage:buffer",
+	nodenames = {"storage:buffer"},
+	interval = 30,
+	chance = 1,
+	action = function(pos, node)
+		local meta = minetest.get_meta(pos)
+		if meta:get_int("delayed") ~= 0 then
+			send_top_item(pos, node)
+		end
+	end
+}
