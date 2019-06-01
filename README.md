@@ -79,3 +79,13 @@ Optionally, the Filteritem is displayed above the filter.
 An Buffer, which stores all items, which it gets and only ejects items 
 if the box is full, or if stackwise is enabled full stackes are ejected.
 
+
+# Distributor
+
+![Screenshot 7](screenshots/screenshot7.png?raw=true "Screenshot 7")
+![Screenshot 8](screenshots/screenshot8.png?raw=true "Screenshot 8")
+
+A distributor is a chest, that fills the inventory of the players which are standing around it.
+It can be connected with pipes. The player-names can be optionally filtered by names (seperated by ';')
+If the limit-switch is enabled, the inventory of the player is only filled, when he has no such material inside.
+
